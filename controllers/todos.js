@@ -37,13 +37,17 @@ const addTodo = async (req, res, next) => {
 const updateTodo = async (req, res, next) => {
   try {
     const todoId = req.params.id;
+    const todos = await Todos.findById(todoId);
+    if (todos.userId !== req.currentUserId) {
+      return res.status(404).json({ message: 'permission denied' });
+    }
 
     const {
       title, status, tags,
     } = req.body;
 
     const updateObj = {};
-    if (req.userId !== undefined) updateObj.userId = req.userId;
+    if (req.currentUserId !== undefined) updateObj.userId = req.currentUserId;
     if (title !== undefined) updateObj.title = title;
     if (status !== undefined) updateObj.status = status;
     if (tags !== undefined) updateObj.tags = tags;
